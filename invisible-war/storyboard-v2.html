@@ -1,0 +1,557 @@
+<title>보이지 않는 전쟁 콘티 v2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: storyboard slate → 2:00 shot-by-shot timeline strip → layer rules → sound design → AI sound → acts of placeholder frames (no images) → references → checklist. */
+:root {
+  --paper: #edf0ea;
+  --sheet: #f8faf6;
+  --ink: #1a1e18;
+  --muted: #5a6356;
+  --rule: #c7cdc2;
+  --olive: #4a5a28;
+  --alert: #b0281f;
+  --calm: #2f6b55;
+  /* film layers: fixed in both themes because they stand for the footage itself */
+  --l-black: #0d0f0c;
+  --l-now: #1d3350;
+  --l-flash: #9a9d97;
+  --l-warm: #e3b062;
+  --l-card: #f4f1e8;
+  --font-display: "Black Han Sans", "IBM Plex Sans KR", sans-serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121510; --sheet: #1a1e17; --ink: #e3e8dd; --muted: #9ba494; --rule: #343b30;
+    --olive: #a9bc78; --alert: #f07a6e; --calm: #7cc4a6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121510; --sheet: #1a1e17; --ink: #e3e8dd; --muted: #9ba494; --rule: #343b30;
+  --olive: #a9bc78; --alert: #f07a6e; --calm: #7cc4a6; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 44px; }
+.stack { display: grid; gap: 44px; }
+
+/* Slate */
+.slate { display: grid; gap: 18px; border-bottom: 2px solid var(--ink); padding-bottom: 26px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(44px, 9vw, 92px); line-height: 1; margin: 0; text-wrap: balance; }
+h1 small { font-family: var(--font-mono); font-size: .22em; font-weight: 600; vertical-align: top; margin-left: .4em; color: var(--olive); }
+.logline { max-width: 62ch; margin: 0; color: var(--muted); font-size: 16px; }
+.lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 32px; margin: 0; }
+.line { display: grid; gap: 2px; min-width: 0; }
+.line dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--olive); }
+.line dd { margin: 0; font-weight: 700; font-size: 17px; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 13px; color: var(--muted); }
+.meta b { color: var(--ink); font-family: var(--font-mono); font-weight: 600; }
+
+/* Timeline strip */
+.tl { display: grid; gap: 6px; }
+.tl h2, .rules h2, .check h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; margin: 0; }
+.tl-sub { margin: 0; font-size: 13px; color: var(--muted); max-width: 72ch; }
+.tl-scroll { overflow-x: auto; padding-bottom: 4px; }
+.tl-inner { min-width: 720px; display: grid; gap: 4px; }
+.tl-bar { display: flex; height: 44px; border: 1px solid var(--ink); }
+.tl-bar a { display: block; min-width: 0; border-right: 1px solid #ffffff40; position: relative; }
+.tl-bar a:last-child { border-right: 0; }
+.tl-bar a:hover, .tl-bar a:focus-visible { outline: 2px solid var(--alert); outline-offset: -2px; z-index: 1; }
+.tl-acts, .tl-ticks { display: flex; font-size: 11px; }
+.tl-acts span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border-left: 1px solid var(--ink); padding-left: 4px; color: var(--ink); font-weight: 500; }
+.tl-ticks { position: relative; height: 16px; font-family: var(--font-mono); color: var(--muted); }
+.tl-ticks span { position: absolute; transform: translateX(-50%); }
+.tl-ticks span:first-child { transform: none; }
+.tl-ticks span:last-child { transform: translateX(-100%); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border: 1px solid var(--ink); display: inline-block; }
+
+.L-black { background: var(--l-black); }
+.L-now { background: var(--l-now); }
+.L-flash { background: var(--l-flash); box-shadow: inset 3px 0 0 #fff; }
+.L-warm { background: var(--l-warm); }
+.L-card { background: var(--l-card); }
+.L-mix { background: repeating-linear-gradient(90deg, var(--l-now) 0 6px, var(--l-flash) 6px 12px); }
+.L-rewind { background: linear-gradient(90deg, var(--l-flash), var(--l-warm)); }
+
+/* Layer rules + sound design */
+.rules { display: grid; gap: 12px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .04em; border-bottom: 2px solid var(--ink); }
+thead th .sw { margin-right: 6px; vertical-align: -2px; }
+tbody th { font-weight: 500; color: var(--muted); white-space: nowrap; }
+td.cuts { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; color: var(--muted); }
+.cast { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 13px; color: var(--muted); }
+.cast b { color: var(--ink); font-weight: 500; }
+
+/* Acts */
+.act { display: grid; gap: 16px; scroll-margin-top: 16px; }
+.act-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.act-head h2 { font-family: var(--font-display); font-weight: 400; font-size: 28px; margin: 0; line-height: 1.2; }
+.act-range { font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.tag { font-size: 12px; font-weight: 500; padding: 2px 8px; border: 1px solid currentColor; border-radius: 2px; white-space: nowrap; }
+.tag.k5 { color: var(--olive); }
+.tag.rm { color: var(--alert); }
+.tag.do { color: var(--calm); }
+
+.shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 16px; }
+@media (max-width: 1000px) { .shots { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .shots { grid-template-columns: minmax(0, 1fr); } }
+
+.shot { display: grid; gap: 8px; align-content: start; min-width: 0; scroll-margin-top: 16px; }
+.frame { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border: 1px solid var(--ink); overflow: hidden; color: #eef1ea; }
+.frame.L-warm, .frame.L-card, .frame.L-flash { color: #1a1e18; }
+.frame.L-flash { box-shadow: inset 4px 0 0 #fff; }
+.fr-size { position: absolute; inset: 0; display: grid; place-content: center; font-family: var(--font-display); font-size: clamp(22px, 3.2vw, 34px); letter-spacing: .02em; opacity: .9; }
+.fr-chip { position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; padding: 1px 6px; background: #0d0f0c99; color: #f2f4ef; }
+.fr-tc { position: absolute; right: 8px; top: 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; opacity: .85; font-variant-numeric: tabular-nums; }
+.fr-pit { position: absolute; right: 8px; bottom: 8px; font-family: var(--font-display); font-size: 16px; background: #fff; color: #0d0f0c; padding: 0 8px; }
+.fr-sfx { position: absolute; right: 8px; bottom: 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; background: var(--l-warm); color: #0d0f0c; padding: 1px 6px; }
+.fr-link { position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 700; padding: 1px 6px; background: #0d0f0c; color: #f2f4ef; }
+.fr-ai { position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 700; padding: 1px 6px; background: #e9eef5; color: #0d0f0c; }
+.fr-quote { position: absolute; inset: 0; display: grid; place-content: center; padding: 14px; text-align: center; font-size: 13px; line-height: 1.5; text-wrap: balance; }
+.frame.has-quote .fr-size { display: none; }
+
+.shot-row { display: flex; align-items: baseline; gap: 8px; }
+.no { font-family: var(--font-mono); font-weight: 600; font-size: 18px; line-height: 1; }
+.dur { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
+.desc { margin: 0; font-size: 14px; }
+.snd { margin: 0; padding-left: 10px; border-left: 2px solid var(--olive); font-size: 13px; color: var(--muted); }
+.snd.line-said { color: var(--ink); }
+.snd.sfx-up { border-left-color: var(--alert); color: var(--ink); }
+
+/* AI sound + references */
+.prompt { margin: 8px 0 0; padding: 12px 14px; background: var(--sheet); border: 1px solid var(--rule); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+details summary { cursor: pointer; font-weight: 500; font-size: 14px; }
+.note { margin: 0; font-size: 13px; color: var(--alert); }
+.refs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px 16px; }
+.ref-group { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.ref-group h3 { margin: 0; font-size: 13px; font-family: var(--font-mono); letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.ref { background: var(--sheet); border: 1px solid var(--rule); padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.ref.pinned { border-color: var(--ink); }
+.ref-top { display: flex; align-items: baseline; gap: 6px 8px; flex-wrap: wrap; }
+.ref-title { font-weight: 700; }
+.ref-at { font-family: var(--font-mono); font-size: 12px; font-weight: 600; border: 1px solid var(--ink); padding: 0 6px; }
+.ref.pinned .ref-at { background: var(--ink); color: var(--paper); }
+.ref-cuts { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.ref p { margin: 0; font-size: 14px; }
+.ref .q { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+
+/* Checklist */
+.check { display: grid; gap: 14px; }
+.check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.group { background: var(--sheet); border: 1px solid var(--rule); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.group h3 { margin: 0; font-size: 13px; font-family: var(--font-mono); letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.group li { display: flex; gap: 10px; align-items: baseline; font-size: 14px; }
+.mark { flex: none; width: 18px; font-family: var(--font-mono); font-weight: 600; color: var(--calm); }
+.where { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.props { margin: 0; padding-left: 18px; font-size: 14px; display: grid; gap: 2px; }
+
+footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; }
+a:focus-visible { outline: 2px solid var(--olive); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+@page { size: A4; margin: 12mm; }
+@media print {
+  :root, :root[data-theme="dark"] {
+    --paper: #fff; --sheet: #fff; --ink: #000; --muted: #444; --rule: #bbb;
+    --olive: #3d4a20; --alert: #a0201a; --calm: #245744; color-scheme: light;
+  }
+  body { padding: 0; font-size: 10.5pt; }
+  .wrap, .stack { gap: 18px; }
+  .shots { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .shot, .group, .ref, .slate, .act-head, .tl, .rules, .check { break-inside: avoid; page-break-inside: avoid; }
+  .act-head { break-after: avoid; page-break-after: avoid; }
+  .frame, .tl-bar, .sw, .fr-chip, .fr-pit, .fr-sfx, .fr-link, .fr-ai, .ref-at { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+<div class="wrap">
+  <header class="slate">
+    <div class="eyebrow"><span>병영문화혁신 · 5관 3략 홍보 UCC</span><span>Storyboard v2 · 레이아웃</span><span>45 shots</span></div>
+    <h1>보이지 않는 전쟁<small>v2</small></h1>
+    <p class="logline">무장 출동한 수색조가 부대 곳곳에서 사건의 흔적을 발견한다. 흔적마다 “핏” 하고 과거가 스치고, 적은 끝내 보이지 않는다. 지휘관의 한마디 뒤, 시간은 사건 직전으로 되감긴다.</p>
+    <dl class="lines">
+      <div class="line"><dt>핵심 대사 · 지휘관</dt><dd>“우리가 경계해야 할 것은 눈에 보이는 적만은 아니다.”</dd></div>
+      <div class="line"><dt>마무리 슬로건</dt><dd>“5관 3략, 병영을 지키는 또 하나의 경계 태세.”</dd></div>
+    </dl>
+    <div class="meta">
+      <span>콘티 합계 <b id="total"></b></span>
+      <span>목표 분량 <b>2:00 내외</b></span>
+      <span>구조 <b>출동 → 흔적 ⇄ 플래시 → 반전 → 되감기 → 정리</b></span>
+    </div>
+  </header>
+
+  <section class="tl" aria-label="2분 타임라인">
+    <h2>2분 타임라인</h2>
+    <p class="tl-sub">컷 하나가 칸 하나이고, 폭은 실제 길이에 비례합니다. 칸을 누르면 해당 컷으로 이동합니다.</p>
+    <div class="tl-scroll">
+      <div class="tl-inner">
+        <div class="tl-acts" id="tl-acts"></div>
+        <div class="tl-bar" id="tl-bar"></div>
+        <div class="tl-ticks" id="tl-ticks"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw L-black"></i>블랙</span>
+      <span><i class="sw L-now"></i>현재 · 출동과 흔적</span>
+      <span><i class="sw L-flash"></i>플래시 · 과거 행동</span>
+      <span><i class="sw L-mix"></i>교차 몽타주</span>
+      <span><i class="sw L-rewind"></i>되감기</span>
+      <span><i class="sw L-warm"></i>정상화</span>
+      <span><i class="sw L-card"></i>자막 카드</span>
+    </div>
+  </section>
+
+  <section class="rules" aria-label="연출 규칙">
+    <h2>연출 규칙</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th></th><th><i class="sw L-now"></i>현재 · 출동과 흔적</th><th><i class="sw L-flash"></i>플래시 · 과거 행동</th><th><i class="sw L-warm"></i>정상화 · 되감기 후</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>카메라</th><td>손에 들고 흔들리게</td><td>고정, 차분하게</td><td>고정 또는 천천히</td></tr>
+          <tr><th>빛 · 색</th><td>어둡고 푸른 톤, 손전등 빛</td><td>채도를 뺀 흑백에 가까운 톤</td><td>밝고 따뜻한 톤, 햇빛</td></tr>
+          <tr><th>소리</th><td>군화, 무전, 긴박한 BGM + 과장된 현장음</td><td>먹먹하게 (물속처럼)</td><td>따뜻한 BGM, 생활 소음</td></tr>
+          <tr><th>진입</th><td>—</td><td><b>핏!</b> + 흰 화면 2프레임</td><td><b>되감기 소리</b> + 역재생</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cast">
+      <span><b>수색조</b> 분대장 A · 대원 B · 대원 C</span>
+      <span><b>지휘관</b> 목소리만</span>
+      <span><b>상황별</b> ① 2명 · ② 1~2명 · ③ 1명 · ④ 2명 · ⑤ 3명</span>
+      <span><b>샷 표기</b> W.S 와이드 · F.S 풀 · K.S 니 · M.S 미디엄(허리 위) · B.S 바스트 · CU 클로즈업 · O.S 어깨 너머</span>
+    </div>
+  </section>
+
+  <section class="rules" id="sound" aria-label="사운드 설계">
+    <h2>사운드 설계 · 현장음 크레센도</h2>
+    <p class="tl-sub">장면 속에 실제로 있는 소리를 실제보다 크게 키워 긴박한 BGM과 섞습니다. 주전자 물 끓는 소리가 음악과 함께 정점에 오르는 연출과 같은 원리예요. 상황마다 그 장소의 소리를 하나씩 정해 두고, #24에서 전부 쌓았다가 #25에서 한 번에 끊습니다. 컷 카드에서 <b>현장음 ↑</b> 표시가 붙은 컷이 해당 장면입니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>상황</th><th>현장음</th><th>키우는 방법</th><th>컷</th></tr></thead>
+        <tbody>
+          <tr><th>① 생활관</th><td>형광등 ‘웅–’, ‘지직’</td><td>저음을 키우고 길게 늘려 BGM 저음과 겹침</td><td class="cuts">#6–7</td></tr>
+          <tr><th>② 금전</th><td>휴대폰 진동 ‘드르륵’</td><td>진동 간격을 BGM 박자에 맞춤</td><td class="cuts">#12</td></tr>
+          <tr><th>③ 보안</th><td>컴퓨터 팬 ‘위잉–’</td><td>음높이를 점점 올려 BGM 상승음과 섞고, 완료음 ‘띵’에서 한순간 끊음</td><td class="cuts">#16–17</td></tr>
+          <tr><th>④ 음주</th><td>빈 병 구르는 소리</td><td>느리게 늘이고 울림(리버브)을 크게</td><td class="cuts">#20</td></tr>
+          <tr><th>⑤ 사생활</th><td>메신저 알림음</td><td>점점 빠르게 반복해 BGM 비트로 만듦</td><td class="cuts">#22</td></tr>
+          <tr><th>가속</th><td>위 소리 전부</td><td>BGM 위에 한꺼번에 쌓아 크레센도 → 이명 ‘삐–’ → 완전한 정적</td><td class="cuts">#24–25</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cast">
+      <span><b>믹싱</b> 현장음을 BGM보다 먼저 작게 시작해 볼륨을 점점 올리기</span>
+      <span><b>캡컷</b> 볼륨 키프레임 · 피치 올리기 · 리버브</span>
+      <span><b>효과음 검색어</b> computer fan hum · fluorescent light buzz · phone vibration · bottle rolling · notification sound</span>
+    </div>
+  </section>
+
+  <section class="rules" id="ai-sound" aria-label="사운드 제작">
+    <h2>사운드 제작 · AI</h2>
+    <p class="tl-sub">배경음악, 효과음, 목소리를 모두 AI로 만듭니다. 제출작에 쓸 음원은 상업적 이용 권한이 있는 유료 요금제에서 생성하고, 결제 내역과 생성 기록을 캡처해 둡니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>구분</th><th>컷 · 시간</th><th>내용</th><th>도구</th></tr></thead>
+        <tbody>
+          <tr><th>긴장 BGM</th><td class="cuts">#1–24 · 0:00–0:52</td><td>후보 3곡: Behind Shaded Windows (ElevenLabs) · Case File 737 - Micro Forensic Interrogation (ElevenLabs) · Too Late to Run - Cinematic. 또는 아래 프롬프트로 새로 생성</td><td>ElevenLabs Music</td></tr>
+          <tr><th>정상화 BGM</th><td class="cuts">#30–45 · 1:06–2:00</td><td>미정. 피아노로 시작해 현악이 더해지는 따뜻한 곡</td><td>ElevenLabs Music</td></tr>
+          <tr><th>효과음</th><td class="cuts">전체</td><td>핏, 이명 ‘삐–’, 되감기, 형광등·진동·컴퓨터 팬·병·알림음</td><td>ElevenLabs Sound Effects</td></tr>
+          <tr><th>목소리</th><td class="cuts">#1 · #29 · #44 · #45</td><td>무전, 지휘관, 슬로건 NA</td><td>ElevenLabs 또는 Higgsfield 음성 생성 (한국어)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>긴장 BGM 구간</th><th>시간</th><th>콘티</th><th>스타일</th></tr></thead>
+        <tbody>
+          <tr><th>1. 도입</th><td class="cuts">0:00–0:05</td><td class="cuts">#1</td><td>드럼 없이 낮은 울림과 무전 잡음. 무전 목소리가 잘 들리게</td></tr>
+          <tr><th>2. 출동</th><td class="cuts">0:05–0:12</td><td class="cuts">#2–5</td><td>북소리 ‘쿵’과 함께 긴박한 박자 시작</td></tr>
+          <tr><th>3. 수색 A</th><td class="cuts">0:12–0:32</td><td class="cuts">#6–15</td><td>일부러 비움. 현장음이 올라갈 자리</td></tr>
+          <tr><th>4. 수색 B</th><td class="cuts">0:32–0:48</td><td class="cuts">#16–23</td><td>현악 반복음이 들어오며 압박감 상승</td></tr>
+          <tr><th>5. 정점</th><td class="cuts">0:48–0:52</td><td class="cuts">#24</td><td>최대 강도까지 올린 뒤 ‘뚝’ 끊고 #25 정적</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <details>
+      <summary>긴장 BGM 생성 프롬프트 · 55초로 만들고 편집에서 0:52에 자르기</summary>
+      <pre class="prompt">Cinematic military thriller underscore, instrumental only, no vocals. D minor, 100 BPM, 55 seconds.
+
+0:00–0:05 — Dark sub-bass drone with faint radio static and distant metallic hum. No drums. Ominous and still.
+0:05–0:12 — Sudden deep taiko hit, then tight snare rolls and a driving low pulse enter. Urgent, like soldiers deploying.
+0:12–0:32 — Pull back to a minimal heartbeat-like low pulse and a soft ticking clock. Very sparse, lots of empty space, cold and investigative.
+0:32–0:48 — Staccato cello and viola ostinato joins, layered with low brass swells. Tension rises steadily, pressure building.
+0:48–0:55 — Full orchestral hits, pounding percussion and a steep rising riser to maximum intensity, then an abrupt hard stop with no reverb tail.
+
+Mood: tense, suspenseful, dark, cinematic, investigative. Avoid: melody-heavy themes, heroic or triumphant feel, electronic dance beats.</pre>
+    </details>
+    <p class="note">무료 요금제로 만든 음원은 개인·비상업 용도만 허용됩니다. 테스트용으로만 쓰고 결제 후 다시 생성하세요. 공모 요강의 AI 생성물 규정도 확인하세요.</p>
+  </section>
+
+  <main class="stack" id="acts"></main>
+
+  <section class="rules" id="refs" aria-label="레퍼런스">
+    <h2>레퍼런스</h2>
+    <p class="tl-sub">진하게 표시한 두 개는 직접 고른 장면입니다. 나머지는 장면 위치로 적었고, 업로드 버전마다 시간이 다를 수 있습니다.</p>
+    <div class="refs">
+      <div class="ref-group">
+        <h3>플래시 · 편집</h3>
+        <div class="ref pinned">
+          <div class="ref-top"><span class="ref-title">레퀴엠 (2000)</span><span class="ref-at">1:29:30</span><span class="ref-cuts">#4 · #8 · #13…</span></div>
+          <p>컷이 바뀌는 순간과 효과음을 정확히 맞추는 플래시 편집. “핏” 타이밍의 기준.</p>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">유주얼 서스펙트 (1995)</span><span class="ref-at">결말 · 마지막 약 5분</span><span class="ref-cuts">#24</span></div>
+          <p>커피잔이 떨어지는 순간, 흩어진 단서들이 플래시로 빠르게 스친다.</p>
+          <span class="q">검색: Usual Suspects ending scene</span>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">쏘우 (2004)</span><span class="ref-at">결말 · 마지막 약 3~4분</span><span class="ref-cuts">#24–25</span></div>
+          <p>플래시가 몰아치며 음악이 쌓이다 문이 닫히며 뚝 끝난다. 결말 장면만 참고.</p>
+          <span class="q">검색: Saw ending scene</span>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">뜨거운 녀석들 (2007)</span><span class="ref-at">후반 · 장비 챙기는 장면</span><span class="ref-cuts">#2–5</span></div>
+          <p>장비를 챙기는 손 클로즈업을 아주 짧게 끊어 이어 붙이는 방식.</p>
+          <span class="q">검색: Hot Fuzz gearing up scene</span>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">시그널 (2016, tvN)</span><span class="ref-at">1화 · 첫 무전 장면</span><span class="ref-cuts">#1</span></div>
+          <p>무전 잡음으로 만드는 긴장, 과거와 현재의 색 구분.</p>
+          <span class="q">검색: 시그널 1화 무전</span>
+        </div>
+      </div>
+      <div class="ref-group">
+        <h3>되감기</h3>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">Coldplay “The Scientist” MV (2002)</span><span class="ref-at">마지막 1분</span><span class="ref-cuts">#32–41</span></div>
+          <p>거꾸로 돌아가며 사고 직전 웃던 순간에 닿는다. 화면은 되감기지만 감정은 따뜻해지는 흐름.</p>
+          <span class="q">검색: Coldplay The Scientist official video</span>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">롤라 런 (1998)</span><span class="ref-at">첫 달리기 끝 · 약 30분</span><span class="ref-cuts">#40–41</span></div>
+          <p>같은 장소·같은 앵글에서 선택이 바뀌면 결과가 바뀐다.</p>
+          <span class="q">검색: Run Lola Run</span>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">테넷 (2020)</span><span class="ref-at">중반 · 고속도로 추격</span><span class="ref-cuts">#32</span></div>
+          <p>역재생 화면을 고급스럽게 보이게 하는 분위기 참고.</p>
+          <span class="q">검색: Tenet highway chase inverted</span>
+        </div>
+      </div>
+      <div class="ref-group">
+        <h3>사운드</h3>
+        <div class="ref pinned">
+          <div class="ref-top"><span class="ref-title">덩케르크 (2017)</span><span class="ref-at">13:20</span><span class="ref-cuts">#6–24</span></div>
+          <p>장면 속 소리가 음악의 박자가 되며 쌓이는 현장음 크레센도.</p>
+        </div>
+      </div>
+      <div class="ref-group">
+        <h3>주제 · 구조</h3>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">Sandy Hook Promise “Evan” (2016)</span><span class="ref-cuts">전체 구조</span></div>
+          <p>화면 구석에 위험 신호를 심어 두고 결말에서 드러낸다. “보이지 않는 전쟁”과 같은 메시지.</p>
+          <span class="q">검색: Sandy Hook Promise Evan</span>
+        </div>
+        <div class="ref">
+          <div class="ref-top"><span class="ref-title">This is Abuse “If you could see yourself” (2010)</span><span class="ref-cuts">반전</span></div>
+          <p>지켜보던 사람이 사실은 가해자였다는 구조.</p>
+          <span class="q">검색: This is Abuse if you could see yourself</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="check" aria-label="공모전 필수 요소">
+    <h2>공모전 필수 요소 체크</h2>
+    <div class="check-grid">
+      <div class="group">
+        <h3>5관 · 5대 자기관리</h3>
+        <ul>
+          <li><span class="mark">✓</span>음주<span class="where">#20–21 · #38</span></li>
+          <li><span class="mark">✓</span>이성<span class="where">#22–23 · #39</span></li>
+          <li><span class="mark">✓</span>금전<span class="where">#12–14 · #35</span></li>
+          <li><span class="mark">✓</span>말<span class="where">#8 · #34</span></li>
+          <li><span class="mark">✓</span>보안<span class="where">#16–18 · #36–37</span></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3>3략 · 3가지 없애기</h3>
+        <ul>
+          <li><span class="mark">✓</span>구타·가혹행위<span class="where">#9</span></li>
+          <li><span class="mark">✓</span>폭언·욕설·인신공격<span class="where">#8</span></li>
+          <li><span class="mark">✓</span>질책·사생활 침해<span class="where">#23</span></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3>3략 · 3가지 잘하기</h3>
+        <ul>
+          <li><span class="mark">✓</span>칭찬·감사·웃어주기<span class="where">#34</span></li>
+          <li><span class="mark">✓</span>전우사랑<span class="where">#35 · #37</span></li>
+          <li><span class="mark">✓</span>존중·배려<span class="where">#38 · #39</span></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3>미리 만들 소품 · 가짜 화면</h3>
+        <ul class="props">
+          <li>빚 독촉 메시지 알림 (#12)</li>
+          <li>도박 사이트 화면 (#14)</li>
+          <li>“복사 완료” 창 (#17)</li>
+          <li>단톡방 화면 (#22)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>총기는 AI로 만드는 오프닝(#2–5)에만 등장하고, 실제 촬영 구간(#6–)에서 수색조는 헬멧·전투조끼·손전등만 들고 총은 화면 밖에 둡니다. 촬영 주의: 구타는 그림자와 소품으로만 암시, 도박·메신저 화면은 직접 만든 가짜 화면, 보안 시설·문서는 화면에 잡히지 않게. #40은 #7과, #41은 #3과 같은 장소·같은 앵글로 촬영.</footer>
+</div>
+
+<script>
+// [no, layer, size, seconds, 화면, 소리·대사, extra]
+// layer: black | now | flash | mix | rewind | warm | card
+// extra.sfx: 현장음을 과장해 BGM과 섞는 컷 · extra.ai: AI로 생성하는 컷
+const ACTS = [
+  { id: "opening", name: "오프닝", sub: "출동", tags: [], shots: [
+    [1, "black", "BLACK", 5, "검은 화면에 자막.", "무전 잡음 → “전 부대원 주목. 부대 내 위험요소가 발견됐다. 즉시 출동한다.”", { quote: "전 부대원 주목.<br>부대 내 위험요소가 발견됐다." }],
+    [2, "now", "CU", 2, "어둠 속에서 헬멧 끈을 조이고 소총을 드는 손. 손전등이 딸깍 켜진다. 얼굴은 보이지 않게.", "딸깍 · 긴박 BGM 시작", { ai: true }],
+    [3, "now", "W.S", 2.5, "낮은 앵글, 복도로 뛰쳐나가는 군화들. 화면 위아래 검은 띠.", "군화 소리", { ai: true }],
+    [4, "flash", "FLASH", 0.5, "무엇인지 거의 안 보이는 0.5초 플래시 (벽에 비친 그림자).", "핏", { ai: true }],
+    [5, "now", "M.S", 2.5, "무장한 수색조 3명의 역광 실루엣이 손전등을 비추며 복도를 이동. 얼굴은 보이지 않게.", "숨소리, 군화", { ai: true }],
+  ]},
+  { id: "s1", name: "상황 ①", sub: "생활관 · 폭언과 구타", tags: [["k5", "5관 · 말"], ["rm", "없애기 · 구타·가혹행위"], ["rm", "없애기 · 폭언·욕설"]], shots: [
+    [6, "now", "F.S", 2, "생활관 문이 열리고 손전등이 어두운 방을 훑는다.", "문 소리 · 형광등 ‘웅–’ 소리가 점점 커지며 BGM 저음과 겹침", { sfx: true }],
+    [7, "now", "F.S", 3, "흔적: 구석에서 벽을 보고 웅크린 병사, 바닥에 떨어진 전투모.", "정적 속에 형광등 ‘웅–’과 ‘지직’만 과장되게 크게", { sfx: true }],
+    [8, "flash", "M.S", 1.5, "선임이 고함치는 입 모양.", "말소리가 먹먹하게 뭉개짐"],
+    [9, "flash", "그림자", 2, "벽에 비친 그림자. 손이 올라가는 순간 바로 컷 (구타는 암시만).", "핏"],
+    [10, "now", "B.S", 1.5, "손전등 빛 아래 분대장 A의 굳은 얼굴.", ""],
+  ]},
+  { id: "s2", name: "상황 ②", sub: "금전 · 도박", tags: [["k5", "5관 · 금전"]], shots: [
+    [11, "now", "PAN", 1, "우→좌로 빠르게 휙 돌며 다음 공간으로.", "휙"],
+    [12, "now", "CU", 3, "흔적: 바닥에 엎어진 휴대폰이 진동, 알림 “언제 갚을 거냐”.", "진동 ‘드르륵’이 BGM 박자에 맞물려 점점 커짐", { sfx: true }],
+    [13, "flash", "M.S", 2, "돈을 빌리는 장병.", "“월급 나오면 바로 갚을게. 한 번만.” (먹먹하게)", { said: true }],
+    [14, "flash", "O.S", 2, "어깨 너머 휴대폰 화면에 초점이 맞으며 도박 화면이 드러난다.", ""],
+    [15, "now", "K.S", 1.5, "대원 B가 휴대폰을 집어 들고 동료를 돌아본다.", ""],
+  ]},
+  { id: "s3", name: "상황 ③", sub: "싸지방 · 보안", tags: [["k5", "5관 · 보안"]], shots: [
+    [16, "now", "W.S", 2, "흔적: 불 꺼진 싸지방, 모니터 하나만 켜져 있다.", "컴퓨터 팬 ‘위잉–’을 극대화, 고음이 BGM 상승음과 섞이며 계속 올라감", { sfx: true }],
+    [17, "now", "CU", 2, "본체에 꽂힌 USB, 화면에 “복사 완료” 창 (가짜 화면, 내용 흐리게).", "팬 소리 정점에서 ‘띵’ 완료음 → 한순간 모든 소리가 끊김", { sfx: true }],
+    [18, "flash", "K.S", 2, "책상 아래로 숙여 몰래 USB를 꽂는 손, 주위를 살피는 눈.", ""],
+    [19, "now", "B.S", 1.5, "모니터 빛을 받은 대원 C의 얼굴.", ""],
+  ]},
+  { id: "s4", name: "상황 ④", sub: "음주", tags: [["k5", "5관 · 음주"]], shots: [
+    [20, "now", "CU", 2, "흔적: 관물대 문틈으로 손전등, 숨겨진 빈 술병.", "빈 병 구르는 소리를 느리게 늘이고 울림을 크게", { sfx: true }],
+    [21, "flash", "M.S", 2.5, "종이컵에 몰래 술을 따른다. 거절하지 못하는 후임.", "“한 잔만 해, 아무도 몰라.” (먹먹하게)", { said: true }],
+  ]},
+  { id: "s5", name: "상황 ⑤", sub: "이성 · 사생활", tags: [["k5", "5관 · 이성"], ["rm", "없애기 · 사생활 침해"]], shots: [
+    [22, "now", "CU", 2, "흔적: 침상 위 켜진 휴대폰, 단톡방에 동기의 연애 사진과 놀리는 메시지 (가짜 화면).", "알림음 ‘띵띵띵’이 점점 빨라지며 BGM 비트가 됨", { sfx: true }],
+    [23, "flash", "M.S", 2.5, "동기의 휴대폰을 빼앗아 든다. 웃는 무리 사이 난처한 얼굴.", "“여자친구 사진 좀 보자.” 웃음소리 (먹먹하게)", { said: true }],
+  ]},
+  { id: "rush", name: "가속", sub: "흔적 ⇄ 플래시", tags: [], shots: [
+    [24, "mix", "MONTAGE", 3, "흔적과 플래시를 0.3초씩 교차 (모자, 그림자, 휴대폰, 도박, USB, 술병, 사진).", "형광등·진동·컴퓨터 팬·병·알림음이 BGM 위에 한꺼번에 쌓이며 커지고, 핏이 빨라지다 이명 “삐–”로 정점", { sfx: true }],
+    [25, "black", "BLACK", 1, "검은 화면.", "완전한 정적"],
+  ]},
+  { id: "twist", name: "반전", sub: "적이 없다", tags: [], shots: [
+    [26, "now", "W.S", 3, "복도 끝에 멈춰 선 수색조 3명. 손전등만 흔들린다.", "숨소리만"],
+    [27, "now", "M.S", 3, "대원 B.", "“흔적은 있는데… 적이 없습니다.”", { said: true }],
+    [28, "now", "M.S", 3, "대원 C.", "“대체 적이 어디에 있습니까?”", { said: true }],
+    [29, "now", "CU", 5, "무전기, 또는 대원들의 얼굴.", "지휘관(V.O) “우리가 경계해야 할 것은 눈에 보이는 적만은 아니다.”", { said: true }],
+    [30, "now", "B.S", 3, "분대장 A가 손전등을 끄고 헬멧을 벗는다.", "긴박 BGM 정지 → 따뜻한 BGM 시작"],
+    [31, "now", "CU", 2, "바닥에 헬멧과 손전등을 내려놓는다.", "장비 내려놓는 소리"],
+  ]},
+  { id: "normal", name: "정상화", sub: "되감기", tags: [["do", "잘하기 · 칭찬·감사"], ["do", "잘하기 · 전우사랑"], ["do", "잘하기 · 존중·배려"]], shots: [
+    [32, "rewind", "REWIND", 1.5, "화면이 빠르게 역재생되며 어둠이 빛으로 바뀐다.", "핏 역재생 + 되감기 소리"],
+    [33, "warm", "F.S", 3, "① 밝은 생활관. 선임이 고함치려는 순간, 헬멧 벗은 A가 다가와 어깨에 손.", ""],
+    [34, "warm", "M.S", 3.5, "① 선임이 숨을 고르고 후임 어깨를 두드리며 웃는다. 후임도 웃는다.", "“아까 잘했다. 고생했어.”", { said: true }],
+    [35, "warm", "M.S", 4.5, "② B가 돈 빌리려던 동기 옆에 앉아 휴대폰 화면을 덮어 준다.", "“혼자 끙끙대지 말고 같이 상담받아 보자.”", { said: true }],
+    [36, "warm", "CU", 1.5, "③ USB를 꽂기 직전, 손목을 잡는 C의 손.", ""],
+    [37, "warm", "B.S", 2.5, "③ C가 웃으며 고개를 젓고, 상대는 USB를 주머니에 넣으며 끄덕인다.", ""],
+    [38, "warm", "M.S", 3.5, "④ 술 권하는 종이컵을 A가 손으로 막는다. 후임이 안도한다.", "“괜찮아, 안 마셔도 돼.”", { said: true }],
+    [39, "warm", "M.S", 3.5, "⑤ 휴대폰을 빼앗았던 동기가 돌려주며 사과하고 어깨동무.", "“미안, 선 넘었다.”", { said: true }],
+    [40, "warm", "F.S", 3.5, "웅크린 병사가 있던 자리에 병사들이 둘러앉아 웃고 있다.", "웃음소리", { link: "= #7 같은 앵글" }],
+    [41, "warm", "W.S", 3.5, "헬멧 없이 햇빛 속을 천천히 걸어가는 수색조.", "느린 발소리", { link: "= #3 같은 복도" }],
+  ]},
+  { id: "ending", name: "마무리", sub: "5관 3략", tags: [], shots: [
+    [42, "card", "CARD", 6, "단어가 하나씩 뜨며 해당 흔적 장면을 작게 함께 보여준다.", "BGM", { quote: "<b>5관</b><br>음주 · 이성 · 금전 · 말 · 보안" }],
+    [43, "card", "CARD", 6, "3략 정리 카드.", "BGM", { quote: "<b>3략</b><br>3가지 없애기 · 3가지 잘하기" }],
+    [44, "black", "BLACK", 4, "슬로건 자막.", "NA “5관 3략, 병영을 지키는 또 하나의 경계 태세.”", { quote: "5관 3략,<br>병영을 지키는 또 하나의 경계 태세.", said: true }],
+    [45, "black", "BLACK", 2, "검은 화면.", "무전 “…상황 종료.”", { quote: "…상황 종료.", said: true }],
+  ]},
+];
+
+const LAYER_NAME = { black: "블랙", now: "현재", flash: "플래시", mix: "교차", rewind: "되감기", warm: "정상화", card: "자막" };
+const pad = n => String(n).padStart(2, "0");
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const tc = t => `${Math.floor(t / 60)}:${pad(Math.floor(t % 60))}${t % 1 ? ".5" : ""}`;
+const secs = s => (s % 1 ? s.toFixed(1) : s) + "s";
+
+// running timecode
+let t = 0;
+ACTS.forEach(a => {
+  a.start = t;
+  a.shots.forEach(s => { s.start = t; t += s[3]; });
+  a.end = t;
+});
+const TOTAL = t;
+document.getElementById("total").textContent = `${tc(TOTAL)} (${TOTAL}초)`;
+
+// timeline strip
+document.getElementById("tl-bar").innerHTML = ACTS.flatMap(a => a.shots).map(s =>
+  `<a href="#shot-${s[0]}" class="L-${s[1]}" style="flex:${s[3]}" title="#${s[0]} ${s[2]} · ${secs(s[3])} · ${esc(s[4])}" aria-label="#${s[0]}"></a>`
+).join("");
+document.getElementById("tl-acts").innerHTML = ACTS.map(a =>
+  `<span style="flex:${a.end - a.start}" title="${a.name} · ${a.sub}">${a.name}</span>`
+).join("");
+document.getElementById("tl-ticks").innerHTML = [0, 30, 60, 90, 120].map(x =>
+  `<span style="left:${x / TOTAL * 100}%">${tc(x)}</span>`
+).join("");
+
+function shotHTML(s) {
+  const [n, layer, size, dur, desc, sound, x = {}] = s;
+  const inner = [
+    x.quote ? `<div class="fr-quote">${x.quote}</div>` : "",
+    `<div class="fr-size">${size}</div>`,
+    `<span class="fr-chip">${LAYER_NAME[layer]}</span>`,
+    `<span class="fr-tc">${tc(s.start)}</span>`,
+    layer === "flash" ? `<span class="fr-pit">핏!</span>` : x.sfx ? `<span class="fr-sfx">현장음 ↑</span>` : "",
+    x.link ? `<span class="fr-link">${x.link}</span>` : "",
+    x.ai ? `<span class="fr-ai">AI 영상</span>` : "",
+  ].join("");
+  const sndClass = x.sfx ? " sfx-up" : x.said ? " line-said" : "";
+  return `<article class="shot" id="shot-${n}">
+    <div class="frame L-${layer}${x.quote ? " has-quote" : ""}" role="img" aria-label="#${n} ${size} ${LAYER_NAME[layer]}">${inner}</div>
+    <div class="shot-row"><span class="no">#${pad(n)}</span><span class="dur">${secs(dur)}</span></div>
+    <p class="desc">${esc(desc)}</p>
+    ${sound ? `<p class="snd${sndClass}">${esc(sound)}</p>` : ""}
+  </article>`;
+}
+
+document.getElementById("acts").innerHTML = ACTS.map(a => {
+  const first = a.shots[0][0], last = a.shots[a.shots.length - 1][0];
+  const range = first === last ? `#${pad(first)}` : `#${pad(first)}–${pad(last)}`;
+  const tags = a.tags.map(([k, txt]) => `<span class="tag ${k}">${txt}</span>`).join("");
+  return `<section class="act" id="${a.id}">
+    <div class="act-head"><h2>${a.name} · ${a.sub}</h2><span class="act-range">${range} · ${tc(a.start)}–${tc(a.end)}</span>${tags ? `<div class="tags">${tags}</div>` : ""}</div>
+    <div class="shots">${a.shots.map(shotHTML).join("")}</div>
+  </section>`;
+}).join("");
+</script>
